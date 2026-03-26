@@ -237,3 +237,69 @@ MongoDB (Admin Validation)
 ✔️ Admin route protection implemented
 ✔️ Role-based authentication working
 ✔️ Secure logout using Redis
+
+
+## 🚀 Day 4: Problem Creation + Code Execution Utility (Judge0)
+
+### 📌 What I Built
+- Problem creation API (Admin only)
+- Problem schema & model
+- Judge0 integration for code execution
+- Language mapping utility
+
+---
+
+### 🔐 Admin Protected Route
+
+```js
+problemRouter.post("/create", adminMiddleware, createProblem);
+✔️ Only admin can create problems
+
+
+🧠 Problem Schema
+title, description
+difficulty (Easy, Medium, Hard)
+tags (Array, LinkedList, Graph, DP)
+visibleTestCases
+hiddenTestCases
+startCode
+referenceSolution
+problemCreator
+⚡ Code Execution (Judge0)
+
+Integrated Judge0 API using Axios.
+
+🔤 Language Mapping
+const language = {
+  "c++": 54,
+  "java": 62,
+  "javascript": 63
+}
+
+📤 Batch Submission
+Multiple test cases ek sath submit hote hain
+Judge0 unko execute karta hai
+Output return hota hai
+🔁 Execution Flow
+User submits code
+Backend → Judge0 API
+Code + test cases send
+Judge0 executes code
+Output return
+Backend compares results
+
+⚙️ Technologies Used
+Node.js
+Express.js
+MongoDB
+Mongoose
+JWT + Redis
+Axios
+Judge0 API
+
+⚡ Outcome
+
+✔️ Problem creation system ready
+✔️ Code execution utility integrated
+✔️ Multi-language support added
+✔️ Ready for full coding platform
