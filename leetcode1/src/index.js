@@ -1,40 +1,38 @@
-const express = require("express")
+const express = require('express')
 const app = express();
-require("dotenv").config();
-const main = require("./config/db.js");
-const cookieParser = require("cookie-parser");
-const authRouter = require("./routes/userAuth.js");
-const redisClient = require("./config/redis.js");
-const problemRouter = require("./routes/problemCreator.js");
-
-
+require('dotenv').config();
+const main =  require('./config/db')
+const cookieParser =  require('cookie-parser');
+const authRouter = require("./routes/userAuth");
+const redisClient = require('./config/redis');
+const problemRouter = require("./routes/problemCreator");
+const submitRouter = require("./routes/submit");
 
 
 app.use(express.json());
 app.use(cookieParser());
-app.use("/user",authRouter);
-app.use("/problem",problemRouter);
+
+app.use('/user',authRouter);
+app.use('/problem',problemRouter);
+app.use('/submission',submitRouter);
 
 
-const InitializeConnection = async()=>{
-    try {
-      await Promise.all([main(),redisClient.connect()]);
-      console.groupCollapsed("DB Connected")
+const InitalizeConnection = async ()=>{
+    try{
 
-       app.listen(process.env.PORT,()=>{
-         console.log("Server is listening at port number:" + process.env.PORT);
-       })
-    } catch (error) {
-      console.log("Error:", error);
+        await Promise.all([main(),redisClient.connect()]);
+        console.log("DB Connected");
+        
+        app.listen(process.env.PORT, ()=>{
+            console.log("Server listening at port number: "+ process.env.PORT);
+        })
+
+    }
+    catch(err){
+        console.log("Error: "+err);
     }
 }
 
-InitializeConnection();
 
+InitalizeConnection();
 
-// main().then(async()=>{
-//     app.listen(process.env.PORT,()=>{
-//       console.log("Server is listening at port number:" + process.env.PORT);
-//     })
-// })
-// .catch(err=>console.log("Error Occurred: "+err));

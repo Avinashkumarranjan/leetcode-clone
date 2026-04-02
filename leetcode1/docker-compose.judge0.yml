@@ -1,0 +1,61 @@
+services:
+  judge0-db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_USER: judge0
+      POSTGRES_PASSWORD: judge0
+      POSTGRES_DB: judge0
+    volumes:
+      - judge0-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  judge0-redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    restart: unless-stopped
+
+  judge0-api:
+    image: judge0/judge0:latest
+    privileged: true
+    security_opt:
+      - seccomp=unconfined
+    volumes:
+      - judge0-box:/box
+    ports:
+      - "2358:2358"
+    depends_on:
+      - judge0-db
+      - judge0-redis
+    environment:
+      POSTGRES_HOST: judge0-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: judge0
+      POSTGRES_PASSWORD: judge0
+      POSTGRES_DB: judge0
+      REDIS_HOST: judge0-redis
+      REDIS_PORT: 6379
+    restart: unless-stopped
+
+  judge0-workers:
+    image: judge0/judge0:latest
+    privileged: true
+    security_opt:
+      - seccomp=unconfined
+    volumes:
+      - judge0-box:/box
+    depends_on:
+      - judge0-api
+    command: ["./scripts/workers"]
+    environment:
+      POSTGRES_HOST: judge0-db
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: judge0
+      POSTGRES_PASSWORD: judge0
+      POSTGRES_DB: judge0
+      REDIS_HOST: judge0-redis
+      REDIS_PORT: 6379
+    restart: unless-stopped
+
+volumes:
+  judge0-db-data:
+  judge0-box:

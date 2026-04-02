@@ -303,3 +303,104 @@ Judge0 API
 ✔️ Code execution utility integrated
 ✔️ Multi-language support added
 ✔️ Ready for full coding platform
+
+---
+
+## Judge0 (Docker, local)
+
+If RapidAPI subscription is a problem, run Judge0 locally with Docker and set `JUDGE0_URL=http://localhost:2358`.
+
+Steps: `docs/judge0-docker.md`
+
+---
+
+## Problem Create (Always Success)
+
+If your immediate goal is to save problems from Postman and always get a success response, the backend now supports skipping Judge0 validation:
+
+- Details: `docs/problem-created-successfully.md`
+
+
+
+day6
+## 🚀 Day 6+7: Problem Management + Submission System (Without Judge0)
+
+### 📌 What I Built
+- Problem update & delete APIs (Admin)
+- Get problem APIs (User)
+- Code submission system
+- Optional Judge0 execution (can skip)
+
+---
+
+## 🔐 Admin Features
+
+### Update Problem
+```js
+problemRouter.put("/update/:id", adminMiddleware, updateProblem);
+
+
+Delete Problem
+problemRouter.delete("/delete/:id", adminMiddleware, deleteProblem);
+
+✔️ Only admin can modify problems
+
+👤 User Features
+Get Single Problem
+problemRouter.get("/problemById/:id", userMiddleware, getProblemById);
+Get All Problems
+problemRouter.get("/getAllProblem", userMiddleware, getAllProblem);
+
+✔️ Authenticated users can access problems
+
+💻 Code Submission System
+Submit API
+submitRouter.post("/submit/:id", userMiddleware, submitCode);
+⚡ Submission Flow
+User submits code
+Backend validates request
+Problem fetched from DB
+Submission stored with status = pending
+🧪 Without Judge0 (Current Mode)
+SKIP_JUDGE0_EXECUTION=true
+
+✔️ Code execution skip ho jata hai
+✔️ Direct result:
+
+status = accepted
+all test cases passed
+🧠 With Judge0 (Optional)
+Code → Judge0 API
+Test cases run
+Output compare
+Status decide:
+accepted
+wrong
+error
+📊 Submission Tracking
+
+Stored fields:
+
+userId
+problemId
+code
+language
+status
+testCasesPassed
+runtime
+memory
+errorMessage
+⚙️ Technologies Used
+Node.js
+Express.js
+MongoDB
+Mongoose
+JWT + Redis
+Axios (Judge0 optional)
+⚡ Outcome
+
+✔️ Full problem CRUD system
+✔️ User can fetch problems
+✔️ Code submission system working
+✔️ Judge0 dependency removed (optional)
+✔️ System works even without Docker/Judge0
