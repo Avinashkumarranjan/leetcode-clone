@@ -1,5 +1,6 @@
 const {getLanguageById,submitBatch,submitToken} = require("../utils/ProblemUtility");
 const Problem = require("../models/problem")
+const User = require("../models/user");
 
 const shouldSkipJudge0 = () => {
   return String(process.env.SKIP_JUDGE0_VALIDATION || "").trim().toLowerCase() === "true";
@@ -272,5 +273,29 @@ const getAllProblem = async(req,res)=>{
 
 
 
+const solvedAllProblembyUser =  async(req,res)=>{
+   
+    try{
+       
+      const userId = req.result._id;
 
-module.exports = {createProblem,updateProblem,deleteProblem,getProblemById,getAllProblem};
+      const user =  await User.findById(userId).populate({
+        path:"problemSolved",
+        select:"_id title difficulty tags"
+      });
+      
+      if(!user)
+        return res.status(404).send("User not found");
+
+      return res.status(200).send(user.problemSolved);
+
+    }
+    catch(err){
+      const message = err instanceof Error ? err.message : String(err);
+      return res.status(500).send("Server Error: " + message);
+    }
+}
+
+
+
+module.exports = {createProblem,updateProblem,deleteProblem,getProblemById,getAllProblem,solvedAllProblembyUser};

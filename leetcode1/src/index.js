@@ -10,6 +10,9 @@ const submitRouter = require("./routes/submit");
 
 
 app.use(express.json());
+// Some clients (e.g. Postman "Text") send `Content-Type: text/plain` even for JSON bodies.
+// Accept that and let controllers parse when needed.
+app.use(express.text({ type: "text/plain" }));
 app.use(cookieParser());
 
 app.use('/user',authRouter);
