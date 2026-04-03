@@ -3,6 +3,7 @@ const User =  require("../models/user")
 const validate = require('../utils/validator');
 const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
+const Submission = require("../models/submission"); 
 
 const getJwtExpiresIn = () => {
     return (process.env.JWT_EXPIRES_IN && String(process.env.JWT_EXPIRES_IN).trim()) || "7d";
@@ -118,6 +119,28 @@ const adminRegister = async(req,res)=>{
     }
     catch(err){
         res.status(400).send("Error: "+err);
+    }
+}
+
+
+const deleteProfile = async(req,res)=>{
+  
+    try{
+       const userId = req.result._id;
+      
+    // userSchema delete
+    await User.findByIdAndDelete(userId);
+
+    // Submission se bhi delete karo...
+    
+    // await Submission.deleteMany({userId});
+    
+    res.status(200).send("Deleted Successfully");
+
+    }
+    catch(err){
+      
+        res.status(500).send("Internal Server Error");
     }
 }
 

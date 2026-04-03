@@ -404,3 +404,182 @@ Axios (Judge0 optional)
 ✔️ Code submission system working
 ✔️ Judge0 dependency removed (optional)
 ✔️ System works even without Docker/Judge0
+
+
+
+
+
+
+day8
+
+
+## 🚀 Day 8: Submission System + User Tracking + Rate Limiting (Production Ready)
+
+---
+
+## 📌 Overview
+
+Day 8 me backend ko production-ready banaya gaya by adding:
+
+- User progress tracking
+- Submission history
+- Run code API
+- Profile deletion with cascade
+- ✅ Submit Code Rate Limiter (NEW)
+
+System ab scalable, secure aur optimized hai.
+
+---
+
+## 🔥 Why Rate Limiter is Important?
+
+### ❗ Problem Without Rate Limiter
+Agar user unlimited requests bheje:
+
+- Server overload ho sakta hai
+- API abuse ho sakta hai
+- Infinite submissions → performance down
+
+---
+
+### ✅ Solution: Rate Limiting
+
+```js
+submitcodeRateLimiter
+
+
+👉 Ye control karta hai:
+
+Ek user kitni baar /submit API hit kar sakta hai
+💡 Example
+Max: 5 requests
+Time: 1 minute
+
+👉 Agar user 6th request bheje:
+
+Too many requests, try again later
+🧠 Submission System (Deep Dive)
+📌 API
+POST /submit/:id
+🔁 Step-by-Step Flow
+1️⃣ Authentication
+const userId = req.result?._id;
+
+✔ Middleware se user verify hota hai
+
+2️⃣ Input Handling
+const body = getParsedBody(req.body);
+const code = body?.code ?? body?.source_code ?? body?.solution;
+const language = body?.language ?? body?.lang;
+
+✔ Flexible API design
+✔ Multiple input formats support
+
+3️⃣ Validation
+userId present?
+problemId valid?
+code & language present?
+mongoose.Types.ObjectId.isValid(problemId)
+4️⃣ Problem Fetch
+const problem = await Problem.findById(problemId);
+
+✔ DB se problem fetch hota hai
+
+5️⃣ Initial Submission Store
+const submittedResult = await Submission.create({
+  userId,
+  problemId,
+  code,
+  language,
+  status: 'pending',
+  testCasesTotal: problem.hiddenTestCases.length
+});
+
+✔ Submission DB me store hota hai
+
+⚡ Without Judge0 Execution (Current Mode)
+SKIP_JUDGE0_EXECUTION=true
+Behavior:
+submittedResult.status = "accepted";
+submittedResult.testCasesPassed = problem.hiddenTestCases.length;
+
+✔ Fast response
+✔ No external dependency
+
+🧠 Problem Solved Tracking
+await User.updateOne(
+  { _id: userId },
+  { $addToSet: { problemSolved: problemId } }
+);
+Why $addToSet?
+Duplicate entries avoid hoti hain
+Clean user progress maintain hota hai
+📊 Submission History
+API
+GET /submission/:pid
+
+✔ All attempts track hote hain
+✔ Debugging easy hoti hai
+
+⚡ Run Code API
+POST /run/:id
+Use Case:
+Code test karna without submission
+Debugging
+Without Judge0:
+
+✔ Mock response generate hota hai
+✔ Instant feedback milta hai
+
+🗑️ Delete Profile (Cascade Delete)
+userSchema.post('findOneAndDelete', async function (userInfo) {
+  await mongoose.model('submission').deleteMany({ userId: userInfo._id });
+});
+Why?
+Orphan data avoid hota hai
+Database clean rehta hai
+⚙️ Rate Limiter (Detailed)
+Example Implementation
+const rateLimit = require("express-rate-limit");
+
+const submitcodeRateLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 5,
+  message: "Too many submissions, please try again later"
+});
+Apply on Route:
+submitRouter.post("/submit/:id", submitcodeRateLimiter, userMiddleware, submitCode);
+🔥 Benefits
+
+✔ Prevent API abuse
+✔ Protect server
+✔ Improve performance
+✔ Fair usage for all users
+
+⚙️ Technologies Used
+Node.js
+Express.js
+MongoDB
+Mongoose
+JWT + Redis
+Rate Limiter
+Axios (optional)
+📚 Key Learnings
+Secure API design
+Rate limiting concept
+Submission lifecycle
+User progress tracking
+Scalable backend architecture
+⚠️ Challenges
+Handling multiple input formats
+Designing rate limiter
+Maintaining DB consistency
+Working without Judge0
+✅ Final Outcome
+
+✔ Full submission system
+✔ User progress tracking
+✔ Secure APIs (Rate limiting)
+✔ Clean DB management
+✔ Works without Judge0
+

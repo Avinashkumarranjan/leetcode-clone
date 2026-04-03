@@ -297,5 +297,26 @@ const solvedAllProblembyUser =  async(req,res)=>{
 }
 
 
+const submittedProblem = async(req,res)=>{
+
+  try{
+     
+    const userId = req.result._id;
+    const problemId = req.params.pid;
+
+  const ans = await Submission.find({userId,problemId});
+  
+  if(ans.length==0)
+    res.status(200).send("No Submission is persent");
+
+  res.status(200).send(ans);
+
+  }
+  catch(err){
+     res.status(500).send("Internal Server Error");
+  }
+}
+
+
 
 module.exports = {createProblem,updateProblem,deleteProblem,getProblemById,getAllProblem,solvedAllProblembyUser};
